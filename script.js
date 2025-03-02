@@ -15,7 +15,7 @@ addTaskButton.addEventListener("click", () => {
   }
 });
 
-function addTask(text, completed) {
+function addTask(text) {
   // Create task item and set text
   const taskItem = document.createElement("li");
   const taskText = document.createElement("span");
@@ -55,8 +55,7 @@ function addTask(text, completed) {
 
 function saveTasks() {
   const tasks = Array.from(taskList.children).map((task) => ({
-    text: task.querySelector("span").textContent, // Extract task text
-    completed: task.classList.contains("completed") // Check if task is completed
+    text: task.querySelector("span").textContent, // Extract task text 
   }));
   localStorage.setItem("tasks", JSON.stringify(tasks)); // Save to local storage
 }
