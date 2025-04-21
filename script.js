@@ -1,61 +1,128 @@
-const taskInput = document.getElementById("task-input");
-const addTaskButton = document.getElementById("add-task");
-const taskList = document.getElementById("task-list");
+document.addEventListener('DOMContentLoaded', function() {
+    const taskInput = document.getElementById('task-input');
+    const addTaskButton = document.getElementById('add-task');
+    const taskList = document.getElementById('task-list');
+    const totalTasksSpan = document.getElementById('total-tasks');
+    const completedTasksSpan = document.getElementById('completed-tasks');
 
-// Load tasks from local storage and add them to the list
-const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
-savedTasks.forEach((task) => addTask(task.text, task.completed));
+    // Load tasks from local storage
+    loadTasks();
 
-// Event listener for adding a new task
-addTaskButton.addEventListener("click", () => {
-  const taskText = taskInput.value.trim();
-  if (taskText) {
-    addTask(taskText, false);
-    taskInput.value = "";
-  }
+    // Add task when button is clicked
+    addTaskButton.addEventListener('click', addTaskFromInput);
+
+    // Add task when Enter key is pressed
+    taskInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            addTaskFromInput();
+        }
+    });
+
+    function addTaskFromInput() {
+        const taskText = taskInput.value.trim();
+        if (taskText) {
+            addTask(taskText, false);
+            taskInput.value = '';
+            taskInput.focus();
+        }
+    }
+
+    function addTask(text, completed = false) {
+        const taskItem = document.createElement('li');
+        taskItem.className = 'task-item' + (completed ? ' completed' : '');
+        
+        const taskContent = document.createElement('span');
+        taskContent.className = 'task-content';
+        taskContent.textContent = text;
+        
+        const taskActions = document.createElement('div');
+        taskActions.className = 'task-actions';
+        
+        // Complete button
+        const completeBtn = document.createElement('button');
+        completeBtn.className = 'task-btn complete-btn';
+        completeBtn.innerHTML = '<i class="fas fa-check"></i>';
+        completeBtn.title = 'Complete';
+        completeBtn.addEventListener('click', function() {
+            taskItem.classList.toggle('completed');
+            updateTaskStats();
+            saveTasks();
+        });
+        
+        // Edit button
+        const editBtn = document.createElement('button');
+        editBtn.className = 'task-btn edit-btn';
+        editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+        editBtn.title = 'Edit';
+        editBtn.addEventListener('click', function() {
+            const newText = prompt('Edit task:', taskContent.textContent);
+            if (newText !== null && newText.trim() !== '') {
+                taskContent.textContent = newText.trim();
+                saveTasks();
+            }
+        });
+        
+        // Delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'task-btn delete-btn';
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteBtn.title = 'Delete';
+        deleteBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to delete this task?')) {
+                taskItem.remove();
+                updateTaskStats();
+                saveTasks();
+            }
+        });
+        
+        taskActions.append(completeBtn, editBtn, deleteBtn);
+        taskItem.append(taskContent, taskActions);
+        taskList.appendChild(taskItem);
+        
+        updateTaskStats();
+        saveTasks();
+    }
+
+    function loadTasks() {
+        const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        taskList.innerHTML = '';
+        
+        if (savedTasks.length === 0) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'empty-state';
+            emptyState.innerHTML = `
+                <i class="fas fa-tasks"></i>
+                <p>No tasks yet. Add one above!</p>
+            `;
+            taskList.appendChild(emptyState);
+        } else {
+            savedTasks.forEach(task => {
+                addTask(task.text, task.completed);
+            });
+        }
+        
+        updateTaskStats();
+    }
+
+    function saveTasks() {
+        const taskItems = document.querySelectorAll('.task-item');
+        const tasks = [];
+        
+        taskItems.forEach(item => {
+            tasks.push({
+                text: item.querySelector('.task-content').textContent,
+                completed: item.classList.contains('completed')
+            });
+        });
+        
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function updateTaskStats() {
+        const totalTasks = document.querySelectorAll('.task-item').length;
+        const completedTasks = document.querySelectorAll('.task-item.completed').length;
+        
+        totalTasksSpan.textContent = `${totalTasks} ${totalTasks === 1 ? 'task' : 'tasks'}`;
+        completedTasksSpan.textContent = `${completedTasks} completed`;
+    }
 });
-
-function addTask(text) {
-  // Create task item and set text
-  const taskItem = document.createElement("li");
-  const taskText = document.createElement("span");
-  
-  
-  taskText.textContent = text;
- 
-
-  // Mark as completed if applicable
-
-  // Create and add "Complete" button
-  const complete=document.createElement('button')
-  complete.innerText='task-done'
-
-  // Create and add "Edit" button
-  const edit=document.createElement('button');
-  edit.innerText='edit-item'
-
-  // Add logic for editing a task
-
-  // Create and add "Delete" button
-  const del=document.createElement('button');
-  del.innerText='del-item'
-
-  // Append buttons to task item and task item to list
-
-  taskList.appendChild(taskItem);
-  taskItem.append(taskText,edit,del,complete);
-  edit.addEventListener('click',()=>{taskText.textContent=prompt()})
-  complete.addEventListener('click',()=>{taskText.style.textDecoration='line-through'})
-  del.addEventListener('click',()=>{taskItem.remove(taskList)})
-  // Save updated tasks to local storage
-  saveTasks();
-
-  
-}
-
-function saveTasks() {
-  const tasks = Array.from(taskList.children).map((task) => ({
-    text: task.querySelector("span").textContent, // Extract task text 
-  }));
-  localStorage.setItem("tasks", JSON.stringify(tasks)); // Save to local storage
-}
