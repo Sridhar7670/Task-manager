@@ -1,20 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Task Manager</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div id="task-manager">
-      <input type="text" id="task-input" placeholder="Enter a task" />
-      <button id="add-task">Add Task</button>
-      <ul id="task-list"></ul>
-      <div class="task-item">
-        
-      </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+   
+</head>
+<body>
+    <div class="container">
+        <h1>Task Manager</h1>
+        <div id="task-manager">
+            <div class="input-group">
+                <input type="text" id="task-input" placeholder="Enter a new task..." />
+                <button id="add-task"><i class="fas fa-plus"></i> Add Task</button>
+            </div>
+            <ul id="task-list"></ul>
+            <div class="task-stats">
+                <span id="total-tasks">0 tasks</span>
+                <span id="completed-tasks">0 completed</span>
+            </div>
+        </div>
     </div>
-    <script src="script.js"></script>
-  </body>
+    <script>
+        // JavaScript will be embedded here
+    </script>
+</body>
 </html>
